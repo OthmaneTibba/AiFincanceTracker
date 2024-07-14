@@ -19,7 +19,9 @@ namespace AiFinanceTracker.Server.Functions.Dtos
 
         [JsonProperty("totalPrice")]
         public double TotalPrice { get; set; }
-        [JsonProperty("TransactionType")]
+        [JsonProperty("transactionType")]
         public string TransactionType { get; set; } = string.Empty;
+        [JsonProperty("receiptUrl")]
+        public string? ReceiptUrl { get; set; }
     }
 }
