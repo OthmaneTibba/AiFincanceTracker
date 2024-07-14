@@ -17,9 +17,10 @@ namespace AiFinanceTracker.Server.Functions.Models
         [JsonProperty("merchant")]
         public Merchant Merchant { get; set; } = null!;
         [JsonProperty("totalPrice")]
-        public double totalPrice { get; set; }
-        [JsonProperty("TransactionType")]
-
-        public string TransactionType { get; set; } = string.Empty; 
+        public double TotalPrice { get; set; }
+        [JsonProperty("transactionType")]
+        public string TransactionType { get; set; } = string.Empty;
+        [JsonProperty("receiptUrl")]
+        public string? ReceiptUrl { get; set; }
     }
 }

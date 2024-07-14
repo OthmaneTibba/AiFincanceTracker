@@ -43,6 +43,15 @@ namespace AiFinanceTracker.Server.Functions
                });
                 }
             }
+            catch(NotSupportedException e)
+            {
+                context.GetHttpContext().Response.StatusCode = 400;
+                await context.GetHttpContext().Response.WriteAsJsonAsync(new Dictionary<string, object>()
+               {
+                   { "statudCode" , 400 },
+                   {"message" , e.Message }
+               });
+            }
             catch (Exception e)
             {
 

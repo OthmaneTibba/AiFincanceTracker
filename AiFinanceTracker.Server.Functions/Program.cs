@@ -1,5 +1,6 @@
 using AiFinanceTracker.Server.Functions;
-
+using AiFinanceTracker.Server.Functions.Interfaces;
+using AiFinanceTracker.Server.Functions.Services;
 using Azure.AI.Vision.ImageAnalysis;
 using Microsoft.Azure.Functions.Worker;
 
@@ -35,6 +36,9 @@ var host = new HostBuilder()
         services.AddScoped(_ => new ImageAnalysisClient(new Uri(imageAnalysisUrl), new Azure.AzureKeyCredential(imageAnalysisKey)));
         services.AddRepositories();
         services.AddApplicationInsightsTelemetryWorkerService();
+        string? blobStorageConnectionString = Environment.GetEnvironmentVariable("AzureWebJobsStorage");
+        if(string.IsNullOrEmpty(blobStorageConnectionString)) throw new ArgumentException(nameof(blobStorageConnectionString));
+        services.AddScoped<IStorageService>(sp => new BlobStorageService(blobStorageConnectionString));
         services.ConfigureFunctionsApplicationInsights();
     })
     .Build();

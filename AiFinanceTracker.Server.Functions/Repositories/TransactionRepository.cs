@@ -15,23 +15,24 @@ namespace AiFinanceTracker.Server.Functions.Repositories
 {
     public class TransactionRepository : ITransactionRepository
     {
-        private CosmosClient _cosmosClient;
+        private readonly CosmosClient _cosmosClient;
+        private readonly IStorageService _storageService;
 
-
-        private ImageAnalysisClient _imageAnalysisClient;
-        private OpenAIAPI _openAIAPI;
-        private Container _container;
+        private readonly ImageAnalysisClient _imageAnalysisClient;
+        private readonly OpenAIAPI _openAIAPI;
+        private readonly Container _container;
 
 
         private const string DATABASE_NAME = "AiFinanceTrackerDb";
         private const string CONTAINER_NAME = "Transactions";
 
-        public TransactionRepository(CosmosClient cosmosClient, ImageAnalysisClient imageAnalysisClient, OpenAIAPI openAIAPI)
+        public TransactionRepository(CosmosClient cosmosClient, ImageAnalysisClient imageAnalysisClient, OpenAIAPI openAIAPI, IStorageService storageService)
         {
             _cosmosClient = cosmosClient;
             _imageAnalysisClient = imageAnalysisClient;
             _openAIAPI = openAIAPI;
             _container = _cosmosClient.GetContainer(DATABASE_NAME, CONTAINER_NAME);
+            _storageService = storageService;
         }
 
         public async Task<Transaction> CreateTransactionFromReceipt(
@@ -44,8 +45,9 @@ namespace AiFinanceTracker.Server.Functions.Repositories
                 Date = createTransactionDto.Date,
                 Items = createTransactionDto.Items,
                 Merchant = createTransactionDto.Merchant,
-                totalPrice = createTransactionDto.totalPrice,
+                TotalPrice = createTransactionDto.TotalPrice,
                 TransactionType = createTransactionDto.TransactionType,
+                ReceiptUrl = createTransactionDto.ReceiptUrl,
             };
 
 
@@ -134,6 +136,13 @@ namespace AiFinanceTracker.Server.Functions.Repositories
                 throw new AiResponseException("no data please try with another receipt or try again!");
             }
 
+
+            var receiptUrl = await _storageService.SaveFileAsync(
+                createTransactionFromReceiptDto.ReceiptFile.OpenReadStream(),
+                createTransactionFromReceiptDto.ReceiptFile.FileName);
+
+            
+
             return new TransactionResponseDto
             {
                 Category = aiResponseDesirialized.Category,
@@ -142,6 +151,7 @@ namespace AiFinanceTracker.Server.Functions.Repositories
                 Items = aiResponseDesirialized.Items,
                 Merchant = aiResponseDesirialized.Merchant,
                 TotalPrice = aiResponseDesirialized.totalPrice,
+                ReceiptUrl = receiptUrl,
             };
         }
 
@@ -168,6 +178,18 @@ namespace AiFinanceTracker.Server.Functions.Repositories
         {
             Transaction updatedTransaction = await _container.ReplaceItemAsync<Transaction>(transaction, transactionId,new PartitionKey(transactionId));
             return updatedTransaction;
+        }
+
+        public async Task<IEnumerable<Transaction>> GetTransactionsByDateAsync(string startDate, string endDate)
+        {
+            var queryText = "SELECT * FROM c WHERE c.date BETWEEN @startDate AND @endDate";
+            var queryDef = new QueryDefinition(queryText)
+                .WithParameter("@startDate", startDate)
+                .WithParameter("@endDate", endDate);
+            var itterator = _container.GetItemQueryIterator<Transaction>(queryDef);
+
+            var res = await itterator.ReadNextAsync();
+            return res.Resource;
         }
     }
 
