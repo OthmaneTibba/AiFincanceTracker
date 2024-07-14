@@ -191,6 +191,22 @@ namespace AiFinanceTracker.Server.Functions.Repositories
             var res = await itterator.ReadNextAsync();
             return res.Resource;
         }
+
+        public async Task<IEnumerable<TotalTransactionAnalytics>> GetTotalTransactionAnalytics(string startDate, string endDate, 
+            string transactionType)
+        {
+            var queryText = @"SELECT  COUNT(1) AS total, c.date FROM Transactions c WHERE c.transactionType = @transactionType AND c.date >= @startDate AND c.date <= @endDate GROUP BY c.date";
+
+            var queryDef = new QueryDefinition(queryText)
+                .WithParameter("@transactionType", transactionType)
+                .WithParameter("@startDate", startDate)
+                .WithParameter("@endDate", endDate);
+
+            var itterator = _container.GetItemQueryIterator<TotalTransactionAnalytics>(queryDef);
+
+            var res = await itterator.ReadNextAsync();
+            return res.Resource;
+        }
     }
 
 
