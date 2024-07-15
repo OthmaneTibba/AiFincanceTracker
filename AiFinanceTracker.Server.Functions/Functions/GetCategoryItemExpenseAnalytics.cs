@@ -18,7 +18,7 @@ namespace AiFinanceTracker.Server.Functions.Functions
         }
 
         [Function("GetCategoryItemExpenseAnalytics")]
-        public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Function, "get", "post")] HttpRequest req)
+        public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Function, "get")] HttpRequest req)
         {
 
             string? transactionType = req.Query["transactionType"];

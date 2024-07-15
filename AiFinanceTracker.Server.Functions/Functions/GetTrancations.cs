@@ -1,5 +1,4 @@
 using AiFinanceTracker.Server.Functions.Interfaces;
-using AiFinanceTracker.Server.Functions.Utils;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
