@@ -207,6 +207,21 @@ namespace AiFinanceTracker.Server.Functions.Repositories
             var res = await itterator.ReadNextAsync();
             return res.Resource;
         }
+
+        public  async Task<IEnumerable<CategoryItemExpenseAnalytics>> GetCategoryItemExpenseAnalytics(string startDate, string endDate, string transactionType)
+        {
+            var queryText = @"SELECT item.category, SUM(item.price * item.quantity) as amount FROM c JOIN item in c.items WHERE c.transactionType = @transactionType AND c.date >= @startDate AND c.date <= @endDate GROUP BY item.category";
+
+            var queryDef = new QueryDefinition(queryText)
+                .WithParameter("@transactionType", transactionType)
+                .WithParameter("@startDate", startDate)
+                .WithParameter("@endDate", endDate);
+
+            var itterator = _container.GetItemQueryIterator<CategoryItemExpenseAnalytics>(queryDef);
+
+            var res = await itterator.ReadNextAsync();
+            return res.Resource;
+        }
     }
 
 

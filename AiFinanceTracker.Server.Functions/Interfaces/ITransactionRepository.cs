@@ -13,5 +13,6 @@ namespace AiFinanceTracker.Server.Functions.Interfaces
         public Task<Transaction> UpdateTransaction(string transactionId, Transaction transaction);
         public Task<IEnumerable<Transaction>> GetTransactionsByDateAsync(string startDate, string endDate); 
         public Task<IEnumerable<TotalTransactionAnalytics>> GetTotalTransactionAnalytics(string startDate,string endDate, string transactionType);
+        public Task<IEnumerable<CategoryItemExpenseAnalytics>> GetCategoryItemExpenseAnalytics(string startDate, string endDate, string transactionType);
     }
 }
