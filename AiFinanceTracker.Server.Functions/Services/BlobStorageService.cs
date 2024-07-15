@@ -52,7 +52,7 @@ namespace AiFinanceTracker.Server.Functions.Services
         private async Task<BlobContainerClient> GetBlobContainerAsync()
         {
             var blobClient = new BlobServiceClient(connectionString);
-            var container = blobClient.GetBlobContainerClient("test");
+            var container = blobClient.GetBlobContainerClient("receips");
             await container.CreateIfNotExistsAsync();
             return container;
         }
